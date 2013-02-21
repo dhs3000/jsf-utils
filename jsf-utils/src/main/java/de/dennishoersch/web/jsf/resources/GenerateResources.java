@@ -37,7 +37,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import de.dennishoersch.web.jsf.utils.Config;
+import de.dennishoersch.web.jsf.utils.FacesConfig;
 
 /**
  * Merges and relocates a set of resources with the helpers of the given {@link GenerateResourcesHelper}.
@@ -88,7 +88,7 @@ public class GenerateResources {
         String generationKey = asGenerationKey(resources);
 
         GeneratedResourceMetadata generatedResource = _generatedResources.get(generationKey);
-        if (mustGenerate(generatedResource) || Config.isDevelopment(context)) {
+        if (mustGenerate(generatedResource) || FacesConfig.isDevelopment(context)) {
             // To avoid multiple attempts of generating at the same time, set a
             // barrier for any latter incoming request until it is ready
             // generated.

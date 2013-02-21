@@ -51,7 +51,7 @@ public class LessStylesheetGenerateHelper implements GenerateResourcesHelper {
     }
 
     @Override
-    public final void relocateResources(UIViewRoot view, FacesContext context, Collection<ResourceMetadata> resources, GeneratedResourceMetadata generatedResource) {
+    public final void replaceResources(UIViewRoot view, FacesContext context, Collection<ResourceMetadata> resources, GeneratedResourceMetadata generatedResource) {
         for (ResourceMetadata resource : resources) {
             // Die Resource nicht entfernen, da manche nur beim initialen
             // Request einer View hinzugefügt werden und somit bei folgenden

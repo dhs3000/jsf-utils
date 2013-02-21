@@ -21,8 +21,8 @@ import javax.faces.context.FacesContext;
 /**
  * @author hoersch
  */
-public final class Config {
-    private Config() {
+public final class FacesConfig {
+    private FacesConfig() {
     }
 
     /**
