@@ -141,7 +141,7 @@ public class ResourceMetadata {
     /**
      * @return a function to create the metadata of a given component resource.
      */
-    public static Function<UIComponent, ResourceMetadata> toResourceMetadata() {
+    public static Function<UIComponent, ResourceMetadata> asResourceMetadata() {
         return ToResourceMetadataFunction.INSTANCE;
     }
 
@@ -150,7 +150,7 @@ public class ResourceMetadata {
      * @return create the metadata of a given component resource
      */
     public static ResourceMetadata toResourceMetadata(UIComponent component) {
-        return toResourceMetadata().apply(component);
+        return asResourceMetadata().apply(component);
     }
 
     private enum ToResourceMetadataFunction implements Function<UIComponent, ResourceMetadata> {

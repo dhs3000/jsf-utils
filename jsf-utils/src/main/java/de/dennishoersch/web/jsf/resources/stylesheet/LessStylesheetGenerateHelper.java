@@ -15,6 +15,11 @@
  */
 package de.dennishoersch.web.jsf.resources.stylesheet;
 
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.transform;
+import static de.dennishoersch.web.jsf.resources.ResourceMetadata.asResourceMetadata;
+import static de.dennishoersch.web.jsf.resources.ResourceMetadata.isStylesheet;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -27,8 +32,6 @@ import javax.faces.context.FacesContext;
 import org.apache.myfaces.shared.renderkit.JSFAttr;
 import org.apache.myfaces.shared.renderkit.html.util.ResourceUtils;
 
-import com.google.common.collect.Collections2;
-
 import de.dennishoersch.web.jsf.resources.GenerateResourcesHelper;
 import de.dennishoersch.web.jsf.resources.GeneratedResourceMetadata;
 import de.dennishoersch.web.jsf.resources.ResourceMetadata;
@@ -40,9 +43,9 @@ import de.dennishoersch.web.jsf.resources.ResourceMetadata;
 public class LessStylesheetGenerateHelper implements GenerateResourcesHelper {
 
     @Override
-    public Collection<ResourceMetadata> collectResources(final UIViewRoot view, final FacesContext context) {
+    public Iterable<ResourceMetadata> collectResources(final UIViewRoot view, final FacesContext context) {
         List<UIComponent> resources = view.getComponentResources(context, "head");
-        return Collections2.transform(Collections2.filter(resources, ResourceMetadata.isStylesheet()), ResourceMetadata.toResourceMetadata());
+        return transform(filter(resources, isStylesheet()), asResourceMetadata());
     }
 
     @Override

@@ -175,7 +175,7 @@ public class GenerateResources {
         return Sets.newLinkedHashSet(_helper.collectResources(view, context));
     }
 
-    private String asGenerationKey(Collection<ResourceMetadata> resources) {
+    private String asGenerationKey(Iterable<ResourceMetadata> resources) {
         return _COMMA_SEPARATED_JOINER.join(Iterables.transform(resources, toStringFunction()));
     }
 

@@ -34,7 +34,7 @@ public interface GenerateResourcesHelper {
      * @param context
      * @return resources
      */
-    public Collection<ResourceMetadata> collectResources(UIViewRoot view, FacesContext context);
+    public Iterable<ResourceMetadata> collectResources(UIViewRoot view, FacesContext context);
 
     /**
      * Generates a new resource with the help of the given informations.
