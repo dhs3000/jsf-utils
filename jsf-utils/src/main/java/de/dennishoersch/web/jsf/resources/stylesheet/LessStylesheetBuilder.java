@@ -46,7 +46,7 @@ public class LessStylesheetBuilder {
 
     private final Collection<ResourceMetadata> _stylesheets;
 
-    private static final String _FILENAME_PREFIX = "hisinone-generated";
+    private static final String _FILENAME_PREFIX = "g";
 
     private final String _resourcesFolder;
 
@@ -55,7 +55,7 @@ public class LessStylesheetBuilder {
     private final String _version;
 
     /** the key of the generation. */
-    protected final String _generationKey;
+    private final String _generationKey;
 
     private final FacesContext _context;
 
