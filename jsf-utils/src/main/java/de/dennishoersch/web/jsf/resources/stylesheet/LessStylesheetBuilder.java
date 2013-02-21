@@ -42,10 +42,10 @@ public class LessStylesheetBuilder extends AbstractResourceBuilder {
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
-    /** Library name of the generated resources. */
+    /** Library name of the generated resource. */
     private static final String GENERATED_LIB = "generated.css";
 
-    /** Library name of the generated resources. */
+    /** file extension of the generated resource. */
     private static final String FILE_EXTENSION = ".css";
 
     /**
