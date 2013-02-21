@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.faces.context.FacesContext;
 
@@ -36,6 +38,8 @@ import de.dennishoersch.web.jsf.resources.ResourceMetadata;
  * @author hoersch
  */
 public class LessStylesheetBuilder extends AbstractResourceBuilder {
+    private static final Logger logger = Logger.getLogger(LessStylesheetBuilder.class.getName());
+
 
     /** Library name of the generated resource. */
     private static final String GENERATED_LIB = "generated.css";
@@ -76,6 +80,7 @@ public class LessStylesheetBuilder extends AbstractResourceBuilder {
 
     @Override
     protected String readSingleResource(ResourceMetadata stylesheet) throws IOException {
+        logger.log(Level.INFO, String.format("Read style resource: '%s:%s'", stylesheet.libraryName, stylesheet.resourceName));
         return new ImportInliner(stylesheet.resourceName, stylesheet.libraryName, _context).execute();
     }
 
@@ -86,7 +91,7 @@ public class LessStylesheetBuilder extends AbstractResourceBuilder {
 
         try {
             String compiled = lessCompiler.compile(stylesheet);
-            return compiled;
+            return compiled.trim();
         } catch (LessException e) {
             throw new IllegalStateException(e);
         }
