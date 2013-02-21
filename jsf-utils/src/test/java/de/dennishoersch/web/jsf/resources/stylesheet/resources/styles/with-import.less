@@ -1,0 +1,13 @@
+@myColor1: #111;
+
+@myColor2: #000;
+
+.baseStyle {
+    color:@myColor1;
+}
+
+@import url("#{resource['styles:imported.less']}");
+
+.afterImportStyle {
+    color:@myColor2;
+}

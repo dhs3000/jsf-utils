@@ -77,6 +77,36 @@ public class LessStylesheetBuilderTest extends AbstractGenerateResourcesTest {
         }
     }
 
+    @Test
+    public void test_less_stylesheet_with_import() throws IOException {
+        buildView("pages/test_include_1_less_stylesheet_with_import.xhtml");
+        {
+            Collection<UIComponent> headResources = getHeadResources();
+
+            assertThat(headResources, size(1));
+        }
+
+        application.publishEvent(facesContext, PreRenderComponentEvent.class, view);
+
+        assertThat(generateResourcesWrapper.wasCalled(), equalTo(Boolean.TRUE));
+
+        {
+            Collection<UIComponent> headResources = getHeadResources();
+
+            assertThat(headResources, size(1));
+
+            // Contains all definitions of both files and no less anymore
+            String content = getContent(Iterables.get(headResources, 0));
+            assertThat(content, containsString(".baseStyle"));
+            assertThat(content, containsString(".afterImportStyle"));
+
+            assertThat(content, containsString(".importedStyle"));
+
+            assertThat(content, not(containsString("myColor1")));
+            assertThat(content, not(containsString("myColor2")));
+        }
+    }
+
     static <T extends Iterable<?>> Size<T> size(int size) {
         return new Size<T>(size);
     }

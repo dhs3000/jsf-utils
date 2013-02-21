@@ -128,12 +128,25 @@ public class ImportInliner {
     }
 
     private String inlineImport(String importTag) throws IOException {
+        // JSF resource URLs look like 'bla.css.faces?ln=css/... & xxx'
         if (importTag.contains(ResourceHandler.RESOURCE_IDENTIFIER)) {
-            // JSF resource URLs look like 'bla.css.faces?ln=css/... & xxx'
             String resource = importTag.substring(importTag.indexOf(ResourceHandler.RESOURCE_IDENTIFIER) + ResourceHandler.RESOURCE_IDENTIFIER.length() + 1);
 
             String resourceName = getResourceName(resource);
             String libraryName = getLibraryName(resource);
+
+            return inlineByJSFResource(libraryName, resourceName);
+        }
+        // or #{resource['styles:imported.less']}
+        if (importTag.startsWith("#{resource[") && importTag.endsWith("]}")) {
+            String resource = importTag.substring("#{resource[".length(), importTag.lastIndexOf("]}"));
+            resource = resource.replace("\"", "").replace("'", "");
+            String[] resourceParts = resource.split(":");
+            if (resourceParts.length<2) {
+                throw new IllegalStateException("Stylesheet '" + _libraryName + ":" + _resourceName + "' contains an @import '" + importTag + "', which can't be inlined (seams incorrect synatx)!");
+            }
+            String libraryName = resourceParts[0];
+            String resourceName = resourceParts[1];
 
             return inlineByJSFResource(libraryName, resourceName);
         }
@@ -151,7 +164,9 @@ public class ImportInliner {
 
     private String getResourceName(String resource) {
         String resourceName = resource.substring(0, resource.indexOf('?'));
-        resourceName = resourceName.replace(".xhtml", "").replace(".faces", "").replace(".jsf", ""); // replace the standard-jsf extensions
+        resourceName = resourceName.replace(".xhtml", "").replace(".faces", "").replace(".jsf", ""); // replace the
+                                                                                                     // standard-jsf
+                                                                                                     // extensions
         return resourceName.trim();
     }
 
@@ -165,7 +180,8 @@ public class ImportInliner {
     }
 
     static String removeCssComments(String s) {
-        String result = s.replaceAll("(?s)/\\*.*?\\*/", ""); // Mehrzeilige Java-Kommentare entfernen, dann einzeilige (falls '//' im Kommentar)
+        String result = s.replaceAll("(?s)/\\*.*?\\*/", ""); // Mehrzeilige Java-Kommentare entfernen, dann einzeilige
+                                                             // (falls '//' im Kommentar)
         result = result.replaceAll("(?)//.*", ""); // Einzeilige Java-Kommentare entfernen
         return result;
     }
