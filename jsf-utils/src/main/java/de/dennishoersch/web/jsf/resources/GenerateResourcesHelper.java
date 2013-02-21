@@ -55,5 +55,5 @@ public interface GenerateResourcesHelper {
      * @param resources
      * @param generatedResource
      */
-    public void relocateResources(UIViewRoot view, FacesContext context, Collection<ResourceMetadata> resources, GeneratedResourceMetadata generatedResource);
+    public void replaceResources(UIViewRoot view, FacesContext context, Collection<ResourceMetadata> resources, GeneratedResourceMetadata generatedResource);
 }

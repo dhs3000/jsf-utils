@@ -80,15 +80,15 @@ public class GenerateResources {
 
         initWith(context);
 
-        Collection<ResourceMetadata> resources = getUniqueResources(view, context);
+        Collection<ResourceMetadata> resources = extractResources(view, context);
         if (resources.isEmpty()) {
             return;
         }
 
-        String generationKey = getGenerationKey(resources);
+        String generationKey = asGenerationKey(resources);
 
         GeneratedResourceMetadata generatedResource = _generatedResources.get(generationKey);
-        if (mustGenerate(generatedResource) || !Config.isProduction(context)) {
+        if (mustGenerate(generatedResource) || Config.isDevelopment(context)) {
             // To avoid multiple attempts of generating at the same time, set a
             // barrier for any latter incoming request until it is ready
             // generated.
@@ -112,7 +112,7 @@ public class GenerateResources {
 
         }
 
-        _helper.relocateResources(view, context, resources, generatedResource);
+        _helper.replaceResources(view, context, resources, generatedResource);
     }
 
     private void waitIfPending(String generationKey) {
@@ -171,11 +171,11 @@ public class GenerateResources {
         }
     }
 
-    private Set<ResourceMetadata> getUniqueResources(UIViewRoot view, FacesContext context) {
+    private Set<ResourceMetadata> extractResources(UIViewRoot view, FacesContext context) {
         return Sets.newLinkedHashSet(_helper.collectResources(view, context));
     }
 
-    private String getGenerationKey(Collection<ResourceMetadata> resources) {
+    private String asGenerationKey(Collection<ResourceMetadata> resources) {
         return _COMMA_SEPARATED_JOINER.join(Iterables.transform(resources, toStringFunction()));
     }
 
