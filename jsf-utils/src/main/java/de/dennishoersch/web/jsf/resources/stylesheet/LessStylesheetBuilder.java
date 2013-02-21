@@ -24,9 +24,6 @@ import java.util.logging.Logger;
 
 import javax.faces.context.FacesContext;
 
-import org.lesscss.LessCompiler;
-import org.lesscss.LessException;
-
 import com.google.common.io.Files;
 
 import de.dennishoersch.web.jsf.resources.AbstractResourceBuilder;
@@ -67,7 +64,7 @@ public class LessStylesheetBuilder extends AbstractResourceBuilder {
 
         String stylesheet = readAndConcatFileContents();
 
-        stylesheet = lessify(stylesheet);
+        stylesheet = Lessifier.lessify(stylesheet);
 
         String cssFilename = getGeneratedFilename();
         String resourceFileName = asAbsoluteResourceFileName(cssFilename);
@@ -82,18 +79,5 @@ public class LessStylesheetBuilder extends AbstractResourceBuilder {
     protected String readSingleResource(ResourceMetadata stylesheet) throws IOException {
         logger.log(Level.INFO, String.format("Read style resource: '%s:%s'", stylesheet.libraryName, stylesheet.resourceName));
         return new ImportInliner(stylesheet.resourceName, stylesheet.libraryName, _context).execute();
-    }
-
-    private String lessify(String stylesheet) {
-        // TODO: kann der als Klassen variable oder so mit lock benutzt werden?
-        LessCompiler lessCompiler = new LessCompiler();
-        lessCompiler.setCompress(true);
-
-        try {
-            String compiled = lessCompiler.compile(stylesheet);
-            return compiled.trim();
-        } catch (LessException e) {
-            throw new IllegalStateException(e);
-        }
     }
 }
