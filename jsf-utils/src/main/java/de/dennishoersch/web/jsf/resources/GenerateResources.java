@@ -87,8 +87,12 @@ public class GenerateResources {
 
         String generationKey = asGenerationKey(resources);
 
+        if (FacesConfig.isDevelopment(context)) {
+            clearCache(generationKey);
+        }
+
         GeneratedResourceMetadata generatedResource = _generatedResources.get(generationKey);
-        if (mustGenerate(generatedResource) || FacesConfig.isDevelopment(context)) {
+        if (mustGenerate(generatedResource)) {
             // To avoid multiple attempts of generating at the same time, set a
             // barrier for any latter incoming request until it is ready
             // generated.
@@ -113,6 +117,16 @@ public class GenerateResources {
         }
 
         _helper.replaceResources(view, context, resources, generatedResource);
+    }
+
+    private void clearCache(String generationKey) {
+        _pendingLock.lock();
+        try {
+            _generatedResources.remove(generationKey);
+        } finally {
+            _pendingLock.unlock();
+        }
+
     }
 
     private void waitIfPending(String generationKey) {
