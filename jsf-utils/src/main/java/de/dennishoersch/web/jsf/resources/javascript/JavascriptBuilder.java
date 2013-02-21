@@ -81,7 +81,7 @@ public class JavascriptBuilder extends AbstractResourceBuilder {
     protected String readSingleResource(ResourceMetadata resource) throws IOException {
         Resource r = _resourceHandler.createResource(resource.resourceName, resource.libraryName);
         if (r != null) {
-            logger.log(Level.INFO, String.format("Inlined resource: '%s:%s'", resource.libraryName, resource.resourceName));
+            logger.log(Level.INFO, String.format("Read script resource: '%s:%s'", resource.libraryName, resource.resourceName));
             return new String(ByteStreams.toByteArray(r.getInputStream()));
         }
         throw new IllegalStateException("Could not read script '" + resource.libraryName + ":" + resource.resourceName + "!");
