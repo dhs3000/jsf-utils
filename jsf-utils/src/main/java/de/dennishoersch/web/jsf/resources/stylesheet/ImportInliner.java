@@ -45,7 +45,7 @@ import com.google.common.io.ByteStreams;
  */
 public class ImportInliner {
 
-    private final Logger logger = Logger.getLogger(getClass().getName());
+    private static final Logger logger = Logger.getLogger(ImportInliner.class.getName());
 
     private static final String IMPORT_TAG = "@import";
 
@@ -137,10 +137,6 @@ public class ImportInliner {
 
             return inlineByJSFResource(libraryName, resourceName);
         }
-        // TODO: weitere Fälle:
-        // - relativer Pfad: kann nicht vorkommen, da er über den JSF-Mechanismus nicht hätte aufgelöst werden können: Kann also auch ohne inlining nicht funktioniert haben
-        // - absoluter Pfad (beginnt mit '/'): Dann würde man vom Server(-Tomcat)-ROOT ausgehen? (GlobalConfiguration.findRoot())
-        //                                     Oder als tatsächliche URL zusammenbauen und abfragen?
         throw new IllegalStateException("Stylesheet '" + _libraryName + ":" + _resourceName + "' contains an @import '" + importTag + "', which can't be inlined (seams to be no JSF resource)!");
     }
 
