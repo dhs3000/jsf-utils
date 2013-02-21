@@ -30,6 +30,7 @@ import org.lesscss.LessException;
 
 import com.google.common.io.Files;
 
+import de.dennishoersch.web.jsf.resources.AbstractResourceBuilder;
 import de.dennishoersch.web.jsf.resources.GeneratedResourceMetadata;
 import de.dennishoersch.web.jsf.resources.ResourceMetadata;
 
@@ -37,27 +38,15 @@ import de.dennishoersch.web.jsf.resources.ResourceMetadata;
  *
  * @author hoersch
  */
-public class LessStylesheetBuilder {
+public class LessStylesheetBuilder extends AbstractResourceBuilder {
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
     /** Library name of the generated resources. */
-    public static final String GENERATED_LIB = "generated.css";
+    private static final String GENERATED_LIB = "generated.css";
 
-    private final Collection<ResourceMetadata> _stylesheets;
-
-    private static final String _FILENAME_PREFIX = "g";
-
-    private final String _resourcesFolder;
-
-    private final String _fileExtension = ".css";
-
-    private final String _version;
-
-    /** the key of the generation. */
-    private final String _generationKey;
-
-    private final FacesContext _context;
+    /** Library name of the generated resources. */
+    private static final String FILE_EXTENSION = ".css";
 
     /**
      * @param generationKey
@@ -67,11 +56,7 @@ public class LessStylesheetBuilder {
      * @param resourcesFolder
      */
     public LessStylesheetBuilder(String generationKey, Collection<ResourceMetadata> stylesheets, FacesContext context, String version, String resourcesFolder) {
-        _generationKey = generationKey;
-        _stylesheets = stylesheets;
-        _context = context;
-        _version = version;
-        _resourcesFolder = resourcesFolder;
+        super(generationKey, stylesheets, context, version, resourcesFolder, FILE_EXTENSION, GENERATED_LIB);
     }
 
     /**
@@ -86,7 +71,7 @@ public class LessStylesheetBuilder {
         stylesheet = lessify(stylesheet);
 
         String cssFilename = getGeneratedFilename();
-        String resourceFileName = getResourceFile(cssFilename);
+        String resourceFileName = asAbsoluteResourceFileName(cssFilename);
 
         Files.write(stylesheet, new File(resourceFileName), Charset.defaultCharset());
 
@@ -98,7 +83,7 @@ public class LessStylesheetBuilder {
     private final String collectFileContents() throws IOException, FileNotFoundException {
         StringWriter output = new StringWriter();
         try {
-            for (ResourceMetadata stylesheet : _stylesheets) {
+            for (ResourceMetadata stylesheet : _resources) {
 
                 String css = new ImportInliner(stylesheet.resourceName, stylesheet.libraryName, _context).execute();
 
@@ -123,25 +108,5 @@ public class LessStylesheetBuilder {
         } catch (LessException e) {
             throw new IllegalStateException(e);
         }
-    }
-
-    private final String getResourceFile(String resourceFilename) throws IOException {
-        return createAndGetResourceFilename(asGeneratedResource(resourceFilename));
-    }
-
-    private final String asGeneratedResource(String resourceFilename) {
-        return GENERATED_LIB + "/" + resourceFilename;
-    }
-
-    private final String getGeneratedFilename() {
-        String cssFilename = _FILENAME_PREFIX + "-v" + _version + "-k" + _generationKey.hashCode() + _fileExtension;
-        return cssFilename;
-    }
-
-    private final String createAndGetResourceFilename(String resourceName) throws IOException {
-        File file = new File(_resourcesFolder + resourceName);
-        Files.createParentDirs(file);
-        file.createNewFile();
-        return file.getAbsolutePath();
     }
 }
