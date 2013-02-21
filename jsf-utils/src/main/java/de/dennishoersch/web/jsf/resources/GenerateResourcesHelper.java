@@ -18,8 +18,12 @@ package de.dennishoersch.web.jsf.resources;
 import java.io.IOException;
 import java.util.Collection;
 
+import javax.faces.component.UIOutput;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
+
+import org.apache.myfaces.shared.renderkit.JSFAttr;
+import org.apache.myfaces.shared.renderkit.html.util.ResourceUtils;
 
 /**
  * Provides helper methods to the generation.
@@ -29,7 +33,7 @@ import javax.faces.context.FacesContext;
 public interface GenerateResourcesHelper {
 
     /**
-     * Collects all resources (metadata) to be processed.
+     * Collects all resources to be processed.
      * @param view
      * @param context
      * @return resources
@@ -37,23 +41,36 @@ public interface GenerateResourcesHelper {
     public Iterable<ResourceMetadata> collectResources(UIViewRoot view, FacesContext context);
 
     /**
-     * Generates a new resource with the help of the given informations.
+     * Generates a new resource with the help of the given resources.
      * @param context
      * @param resources
      * @param generationKey
      * @param version
-     * @param webbappPath
+     * @param resourcesFolder
      * @return the metadata of the generated resource
      * @throws IOException
      */
-    public GeneratedResourceMetadata generateResource(FacesContext context, Collection<ResourceMetadata> resources, String generationKey, String version, String webbappPath) throws IOException;
+    public GeneratedResourceMetadata generateResource(FacesContext context, Collection<ResourceMetadata> resources, String generationKey, String version, String resourcesFolder) throws IOException;
 
     /**
-     * Re-locates the resources that are merged into a single one.
+     * Replaces the resources with the given single one.
      * @param view
      * @param context
      * @param resources
      * @param generatedResource
      */
     public void replaceResources(UIViewRoot view, FacesContext context, Collection<ResourceMetadata> resources, GeneratedResourceMetadata generatedResource);
+
+    public class Util {
+        public static void addOutputResource(final FacesContext facesContext, final String rendererType, final String libraryName, final String resourceName, String target) {
+
+            UIOutput outputResource = (UIOutput) facesContext.getApplication().createComponent(facesContext, ResourceUtils.JAVAX_FACES_OUTPUT_COMPONENT_TYPE, rendererType);
+            outputResource.getAttributes().put(JSFAttr.LIBRARY_ATTR, libraryName);
+            outputResource.getAttributes().put(JSFAttr.NAME_ATTR, resourceName);
+            outputResource.setTransient(true);
+            outputResource.setId(facesContext.getViewRoot().createUniqueId());
+            facesContext.getViewRoot().addComponentResource(facesContext, outputResource, target);
+
+        }
+    }
 }

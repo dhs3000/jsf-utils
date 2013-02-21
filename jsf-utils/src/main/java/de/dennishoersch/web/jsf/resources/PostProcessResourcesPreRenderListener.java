@@ -20,14 +20,26 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.SystemEvent;
 import javax.faces.event.SystemEventListener;
 
+import de.dennishoersch.web.jsf.resources.javascript.JavascriptGenerateHelper;
 import de.dennishoersch.web.jsf.resources.stylesheet.LessStylesheetGenerateHelper;
+
 /**
- * @author hoersch
+ * Listener that post-processes the view root and the registered stylesheets and scripts.
  *
+ * <p>Usage: Register the listener in faces-config.xml with
+ * <pre>
+ * &lt;system-event-listener>
+ *     &lt;system-event-listener-class>de.dennishoersch.web.jsf.resources.PostProcessResourcesPreRenderListener&lt;/system-event-listener-class>
+ *     &lt;system-event-class>javax.faces.event.PreRenderComponentEvent&lt;/system-event-class>
+ * &lt;/system-event-listener> *
+ * </pre>
+ * </p>
+ * @author hoersch
  */
-public class PostProcessResourcesPreRenderListener  implements SystemEventListener {
+public class PostProcessResourcesPreRenderListener implements SystemEventListener {
 
     private GenerateResources _stylesheetPostProcessor = new GenerateResources(new LessStylesheetGenerateHelper(), "0.1");
+    private GenerateResources _javascriptPostProcessor = new GenerateResources(new JavascriptGenerateHelper(), "0.1");
 
     @Override
     public boolean isListenerForSource(Object source) {
@@ -39,11 +51,15 @@ public class PostProcessResourcesPreRenderListener  implements SystemEventListen
         UIViewRoot view = (UIViewRoot) event.getSource();
 
         postPocessStyles(view);
-
+        postPocessScripts(view);
     }
 
     private void postPocessStyles(UIViewRoot view) {
         _stylesheetPostProcessor.edit(view, FacesContext.getCurrentInstance());
+    }
+
+    private void postPocessScripts(UIViewRoot view) {
+        _javascriptPostProcessor.edit(view, FacesContext.getCurrentInstance());
     }
 
 }

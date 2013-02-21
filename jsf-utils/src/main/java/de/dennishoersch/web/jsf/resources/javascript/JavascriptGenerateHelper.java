@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.dennishoersch.web.jsf.resources.stylesheet;
+package de.dennishoersch.web.jsf.resources.javascript;
 
+import static com.google.common.collect.Iterables.concat;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.transform;
 import static de.dennishoersch.web.jsf.resources.ResourceMetadata.asResourceMetadata;
-import static de.dennishoersch.web.jsf.resources.ResourceMetadata.isStylesheet;
+import static de.dennishoersch.web.jsf.resources.ResourceMetadata.isScript;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -35,27 +36,29 @@ import de.dennishoersch.web.jsf.resources.GeneratedResourceMetadata;
 import de.dennishoersch.web.jsf.resources.ResourceMetadata;
 
 /**
- * Reads all registered stylesheets and lessifies them before registering a new single stylesheet resource instead of them.
  * @author hoersch
  */
-public class LessStylesheetGenerateHelper implements GenerateResourcesHelper {
+public class JavascriptGenerateHelper implements GenerateResourcesHelper {
 
     @Override
-    public Iterable<ResourceMetadata> collectResources(final UIViewRoot view, final FacesContext context) {
-        List<UIComponent> resources = view.getComponentResources(context, "head");
-        return transform(filter(resources, isStylesheet()), asResourceMetadata());
+    public Iterable<ResourceMetadata> collectResources(UIViewRoot view, FacesContext context) {
+        List<UIComponent> headResources = view.getComponentResources(context, "head");
+        List<UIComponent> bodyResources = view.getComponentResources(context, "body");
+        return transform(filter(concat(headResources, bodyResources), isScript()), asResourceMetadata());
     }
 
     @Override
-    public GeneratedResourceMetadata generateResource(FacesContext context, Collection<ResourceMetadata> resources, String generationKey, String version, String resourcesFolder) throws IOException {
-        return new LessStylesheetBuilder(generationKey, resources, context, version, resourcesFolder).build();
+    public GeneratedResourceMetadata generateResource(FacesContext context, Collection<ResourceMetadata> scripts, String generationKey, String version, String resourcesFolder) throws IOException {
+        return new JavascriptBuilder(generationKey, scripts, context, version, resourcesFolder).build();
     }
 
     @Override
-    public final void replaceResources(UIViewRoot view, FacesContext context, Collection<ResourceMetadata> resources, GeneratedResourceMetadata generatedResource) {
+    public void replaceResources(UIViewRoot view, FacesContext context, Collection<ResourceMetadata> resources, GeneratedResourceMetadata generatedResource) {
         for (ResourceMetadata resource : resources) {
-            ResourceUtils.markStylesheetAsRendered(context, resource.libraryName, resource.resourceName);
+            ResourceUtils.markScriptAsRendered(context, resource.libraryName, resource.resourceName);
         }
-        GenerateResourcesHelper.Util.addOutputResource(context, ResourceUtils.DEFAULT_STYLESHEET_RENDERER_TYPE, generatedResource.libraryName, generatedResource.resourceName, "head");
+
+        GenerateResourcesHelper.Util.addOutputResource(context, ResourceUtils.DEFAULT_SCRIPT_RENDERER_TYPE, generatedResource.libraryName, generatedResource.resourceName, "body");
+
     }
 }

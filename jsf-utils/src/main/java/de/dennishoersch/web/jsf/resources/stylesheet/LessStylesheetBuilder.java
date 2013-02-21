@@ -16,12 +16,9 @@
 package de.dennishoersch.web.jsf.resources.stylesheet;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.Collection;
-import java.util.logging.Logger;
 
 import javax.faces.context.FacesContext;
 
@@ -39,8 +36,6 @@ import de.dennishoersch.web.jsf.resources.ResourceMetadata;
  * @author hoersch
  */
 public class LessStylesheetBuilder extends AbstractResourceBuilder {
-
-    private final Logger logger = Logger.getLogger(getClass().getName());
 
     /** Library name of the generated resource. */
     private static final String GENERATED_LIB = "generated.css";
@@ -66,7 +61,7 @@ public class LessStylesheetBuilder extends AbstractResourceBuilder {
      */
     public GeneratedResourceMetadata build() throws IOException {
 
-        String stylesheet = collectFileContents();
+        String stylesheet = readAndConcatFileContents();
 
         stylesheet = lessify(stylesheet);
 
@@ -75,26 +70,13 @@ public class LessStylesheetBuilder extends AbstractResourceBuilder {
 
         Files.write(stylesheet, new File(resourceFileName), Charset.defaultCharset());
 
-        GeneratedResourceMetadata generatedStylesheet = new GeneratedResourceMetadata(GENERATED_LIB, cssFilename);
-
-        return generatedStylesheet;
+        return newGeneratedResourceMetadata(cssFilename);
     }
 
-    private final String collectFileContents() throws IOException, FileNotFoundException {
-        StringWriter output = new StringWriter();
-        try {
-            for (ResourceMetadata stylesheet : _resources) {
 
-                String css = new ImportInliner(stylesheet.resourceName, stylesheet.libraryName, _context).execute();
-
-                output.write(css);
-            }
-        } finally {
-            output.close();
-        }
-
-        String styles = output.toString();
-        return styles;
+    @Override
+    protected String readSingleResource(ResourceMetadata stylesheet) throws IOException {
+        return new ImportInliner(stylesheet.resourceName, stylesheet.libraryName, _context).execute();
     }
 
     private String lessify(String stylesheet) {

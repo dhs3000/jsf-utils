@@ -16,7 +16,9 @@
 package de.dennishoersch.web.jsf.resources;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Collection;
 
 import javax.faces.context.FacesContext;
@@ -28,6 +30,7 @@ import com.google.common.io.Files;
  *
  */
 public abstract class AbstractResourceBuilder {
+
     private static final String _FILENAME_PREFIX = "g";
 
     private final String _generationKey;
@@ -54,6 +57,29 @@ public abstract class AbstractResourceBuilder {
         _fileExtension = fileExtension;
     }
 
+    protected final String readAndConcatFileContents() throws IOException, FileNotFoundException {
+        StringWriter output = new StringWriter();
+        try {
+            for (ResourceMetadata stylesheet : _resources) {
+
+                String content = readSingleResource(stylesheet);
+
+                output.write(content);
+            }
+        } finally {
+            output.close();
+        }
+
+        String styles = output.toString();
+        return styles;
+    }
+
+    /**
+     * @param resource
+     * @return the contents of a single resource
+     */
+    protected abstract String readSingleResource(ResourceMetadata resource) throws IOException;
+
     protected final String asAbsoluteResourceFileName(String resourceFilename) throws IOException {
         return createAndGetResourceFilename(asGeneratedResource(resourceFilename));
     }
@@ -72,5 +98,9 @@ public abstract class AbstractResourceBuilder {
         Files.createParentDirs(file);
         file.createNewFile();
         return file.getAbsolutePath();
+    }
+
+    protected final GeneratedResourceMetadata newGeneratedResourceMetadata(String resourceName) {
+        return new GeneratedResourceMetadata(_libraryName, resourceName);
     }
 }
