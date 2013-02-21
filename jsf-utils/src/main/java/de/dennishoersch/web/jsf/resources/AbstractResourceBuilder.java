@@ -70,8 +70,7 @@ public abstract class AbstractResourceBuilder {
             output.close();
         }
 
-        String styles = output.toString();
-        return styles;
+        return output.toString().trim();
     }
 
     /**
