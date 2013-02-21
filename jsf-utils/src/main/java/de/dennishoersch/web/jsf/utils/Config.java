@@ -33,4 +33,13 @@ public final class Config {
     public static boolean isProduction(FacesContext context) {
         return context.getApplication().getProjectStage().equals(ProjectStage.Production);
     }
+
+    /**
+     *
+     * @param context
+     * @return whether the production mode is disabled
+     */
+    public static boolean isDevelopment(FacesContext context) {
+        return !isProduction(context);
+    }
 }
