@@ -32,7 +32,7 @@ import org.junit.Test;
 import com.google.common.collect.Iterables;
 
 import de.dennishoersch.web.jsf.resources.AbstractGenerateResourcesTest;
-import de.dennishoersch.web.jsf.resources.GenerateResourcesHelper;
+import de.dennishoersch.web.jsf.resources.ResourceGenerationStrategy;
 
 /**
  * @author hoersch
@@ -44,8 +44,8 @@ public class LessStylesheetBuilderTest extends AbstractGenerateResourcesTest {
     }
 
     @Override
-    protected GenerateResourcesHelper createHelper() {
-        return new LessStylesheetGenerateHelper();
+    protected ResourceGenerationStrategy createHelper() {
+        return new LessStylesheetGenerationStrategy();
     }
 
     @Test

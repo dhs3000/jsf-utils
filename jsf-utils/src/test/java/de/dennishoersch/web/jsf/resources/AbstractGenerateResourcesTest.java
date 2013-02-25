@@ -66,7 +66,7 @@ public abstract class AbstractGenerateResourcesTest extends BaseJSFTest {
     /**
      * @return the helper for this tests
      */
-    protected abstract GenerateResourcesHelper createHelper();
+    protected abstract ResourceGenerationStrategy createHelper();
 
     @Override
     protected void setUpServletObjects() throws Exception {

@@ -25,8 +25,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
@@ -40,7 +38,7 @@ import com.google.common.collect.Sets;
 import de.dennishoersch.web.jsf.utils.FacesConfig;
 
 /**
- * Merges and relocates a set of resources with the helpers of the given {@link GenerateResourcesHelper}.
+ * Processes a set of resources into a single generated resource with the help of a given strategy ({@link ResourceGenerationStrategy}).
  *
  * @author hoersch
  */
@@ -48,9 +46,7 @@ public class GenerateResources {
     /** a joiner joining with comma and skipping null values. */
     private static final Joiner _COMMA_SEPARATED_JOINER = Joiner.on(",").skipNulls();
 
-    static final String RESOURCES_FOLDER_NAME = "resources";
-
-    private final Logger logger = Logger.getLogger(getClass().getName());
+    private static final String RESOURCES_FOLDER_NAME = "resources";
 
     private final Map<String, GeneratedResourceMetadata> _generatedResources = Maps.newConcurrentMap();
 
@@ -58,7 +54,7 @@ public class GenerateResources {
 
     private final Lock _pendingLock = new ReentrantLock();
 
-    private final GenerateResourcesHelper _helper;
+    private final ResourceGenerationStrategy _strategy;
 
     private final String _version;
 
@@ -66,10 +62,10 @@ public class GenerateResources {
 
     /**
      *
-     * @param helper
+     * @param strategy
      */
-    public GenerateResources(GenerateResourcesHelper helper, String version) {
-        _helper = helper;
+    public GenerateResources(ResourceGenerationStrategy strategy, String version) {
+        _strategy = strategy;
         _version = version;
     }
 
@@ -78,7 +74,7 @@ public class GenerateResources {
             return;
         }
 
-        initWith(context);
+        initIfNeccessary(context);
 
         Collection<ResourceMetadata> resources = extractResources(view, context);
         if (resources.isEmpty()) {
@@ -96,27 +92,27 @@ public class GenerateResources {
             // To avoid multiple attempts of generating at the same time, set a
             // barrier for any latter incoming request until it is ready
             // generated.
-            waitIfPending(generationKey);
+            waitIfGenerationIsPending(generationKey);
 
             generatedResource = _generatedResources.get(generationKey);
 
             if (mustGenerate(generatedResource)) {
                 try {
 
-                    generatedResource = _helper.generateResource(context, resources, generationKey, _version, _resourcesFolder);
+                    generatedResource = _strategy.generateResource(context, resources, generationKey, _version, _resourcesFolder);
                     _generatedResources.put(generationKey, generatedResource);
 
                     awakeWaiters(generationKey);
                 } catch (IOException e) {
                     Throwables.propagate(e);
                 } finally {
-                    removePending(generationKey);
+                    removeBlocking(generationKey);
                 }
             }
 
         }
 
-        _helper.replaceResources(view, context, resources, generatedResource);
+        _strategy.replaceResources(view, context, resources, generatedResource);
     }
 
     private void clearCache(String generationKey) {
@@ -129,7 +125,7 @@ public class GenerateResources {
 
     }
 
-    private void waitIfPending(String generationKey) {
+    private void waitIfGenerationIsPending(String generationKey) {
         CountDownLatch isPending = null;
         _pendingLock.lock();
         try {
@@ -146,8 +142,7 @@ public class GenerateResources {
             try {
                 boolean timeout = !isPending.await(15, TimeUnit.SECONDS);
                 if (timeout) {
-                    logger.log(Level.WARNING, "Timeout reached while waiting for merged resources! Reason is either because it took to long or the creator thread had an exception.");
-                    throw new IllegalStateException("Timeout reached while waiting for merged resources! Reason is either because it took to long or the creator thread had an exception.");
+                    throw new IllegalStateException("Timeout reached while waiting for generated resources! Reason is either because it took to long or the creator thread had an exception.");
                 }
             } catch (InterruptedException e) {
                 Throwables.propagate(e);
@@ -165,7 +160,7 @@ public class GenerateResources {
         }
     }
 
-    private void removePending(String generationKey) {
+    private void removeBlocking(String generationKey) {
         _pendingLock.lock();
         try {
             _pendingGeneratedResources.remove(generationKey);
@@ -175,7 +170,7 @@ public class GenerateResources {
 
     }
 
-    private void initWith(FacesContext context) {
+    private void initIfNeccessary(FacesContext context) {
         if (_resourcesFolder == null) {
             _resourcesFolder = context.getExternalContext().getRealPath("/");
             if (!_resourcesFolder.endsWith("/")) {
@@ -186,7 +181,7 @@ public class GenerateResources {
     }
 
     private Set<ResourceMetadata> extractResources(UIViewRoot view, FacesContext context) {
-        return Sets.newLinkedHashSet(_helper.collectResources(view, context));
+        return Sets.newLinkedHashSet(_strategy.collectResources(view, context));
     }
 
     private String asGenerationKey(Iterable<ResourceMetadata> resources) {

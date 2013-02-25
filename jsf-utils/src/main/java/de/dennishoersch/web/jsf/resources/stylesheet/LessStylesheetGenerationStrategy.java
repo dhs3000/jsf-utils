@@ -30,7 +30,7 @@ import javax.faces.context.FacesContext;
 
 import org.apache.myfaces.shared.renderkit.html.util.ResourceUtils;
 
-import de.dennishoersch.web.jsf.resources.GenerateResourcesHelper;
+import de.dennishoersch.web.jsf.resources.ResourceGenerationStrategy;
 import de.dennishoersch.web.jsf.resources.GeneratedResourceMetadata;
 import de.dennishoersch.web.jsf.resources.ResourceMetadata;
 
@@ -38,7 +38,7 @@ import de.dennishoersch.web.jsf.resources.ResourceMetadata;
  * Reads all registered stylesheets and lessifies them before registering a new single stylesheet resource instead of them.
  * @author hoersch
  */
-public class LessStylesheetGenerateHelper implements GenerateResourcesHelper {
+public class LessStylesheetGenerationStrategy implements ResourceGenerationStrategy {
 
     @Override
     public Iterable<ResourceMetadata> collectResources(final UIViewRoot view, final FacesContext context) {
@@ -56,6 +56,6 @@ public class LessStylesheetGenerateHelper implements GenerateResourcesHelper {
         for (ResourceMetadata resource : resources) {
             ResourceUtils.markStylesheetAsRendered(context, resource.libraryName, resource.resourceName);
         }
-        GenerateResourcesHelper.Util.addOutputResource(context, ResourceUtils.DEFAULT_STYLESHEET_RENDERER_TYPE, generatedResource.libraryName, generatedResource.resourceName, "head");
+        ResourceGenerationStrategy.Util.addOutputResource(context, ResourceUtils.DEFAULT_STYLESHEET_RENDERER_TYPE, generatedResource.libraryName, generatedResource.resourceName, "head");
     }
 }

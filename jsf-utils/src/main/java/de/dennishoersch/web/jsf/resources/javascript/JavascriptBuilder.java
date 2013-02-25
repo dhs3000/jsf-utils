@@ -69,6 +69,8 @@ public class JavascriptBuilder extends AbstractResourceBuilder {
 
         String scripts = readAndConcatFileContents();
 
+        scripts = ClosureCompiler.compile(scripts);
+
         String scriptFilename = getGeneratedFilename();
         String resourceFileName = asAbsoluteResourceFileName(scriptFilename);
 

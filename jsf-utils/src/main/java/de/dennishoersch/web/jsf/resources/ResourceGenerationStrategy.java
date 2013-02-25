@@ -26,11 +26,11 @@ import org.apache.myfaces.shared.renderkit.JSFAttr;
 import org.apache.myfaces.shared.renderkit.html.util.ResourceUtils;
 
 /**
- * Provides helper methods to the generation.
+ * Strategy how to do the generation in detail.
  *
  * @author hoersch
  */
-public interface GenerateResourcesHelper {
+public interface ResourceGenerationStrategy {
 
     /**
      * Collects all resources to be processed.

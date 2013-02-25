@@ -20,8 +20,8 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.SystemEvent;
 import javax.faces.event.SystemEventListener;
 
-import de.dennishoersch.web.jsf.resources.javascript.JavascriptGenerateHelper;
-import de.dennishoersch.web.jsf.resources.stylesheet.LessStylesheetGenerateHelper;
+import de.dennishoersch.web.jsf.resources.javascript.JavascriptGenerationStrategy;
+import de.dennishoersch.web.jsf.resources.stylesheet.LessStylesheetGenerationStrategy;
 
 /**
  * Listener that post-processes the view root and the registered stylesheets and scripts.
@@ -38,8 +38,8 @@ import de.dennishoersch.web.jsf.resources.stylesheet.LessStylesheetGenerateHelpe
  */
 public class PostProcessResourcesPreRenderListener implements SystemEventListener {
 
-    private GenerateResources _stylesheetPostProcessor = new GenerateResources(new LessStylesheetGenerateHelper(), "0.1");
-    private GenerateResources _javascriptPostProcessor = new GenerateResources(new JavascriptGenerateHelper(), "0.1");
+    private GenerateResources _stylesheetPostProcessor = new GenerateResources(new LessStylesheetGenerationStrategy(), "0.1");
+    private GenerateResources _javascriptPostProcessor = new GenerateResources(new JavascriptGenerationStrategy(), "0.1");
 
     @Override
     public boolean isListenerForSource(Object source) {

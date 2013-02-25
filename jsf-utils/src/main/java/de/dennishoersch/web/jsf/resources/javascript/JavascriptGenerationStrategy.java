@@ -31,14 +31,14 @@ import javax.faces.context.FacesContext;
 
 import org.apache.myfaces.shared.renderkit.html.util.ResourceUtils;
 
-import de.dennishoersch.web.jsf.resources.GenerateResourcesHelper;
+import de.dennishoersch.web.jsf.resources.ResourceGenerationStrategy;
 import de.dennishoersch.web.jsf.resources.GeneratedResourceMetadata;
 import de.dennishoersch.web.jsf.resources.ResourceMetadata;
 
 /**
  * @author hoersch
  */
-public class JavascriptGenerateHelper implements GenerateResourcesHelper {
+public class JavascriptGenerationStrategy implements ResourceGenerationStrategy {
 
     @Override
     public Iterable<ResourceMetadata> collectResources(UIViewRoot view, FacesContext context) {
@@ -58,7 +58,7 @@ public class JavascriptGenerateHelper implements GenerateResourcesHelper {
             ResourceUtils.markScriptAsRendered(context, resource.libraryName, resource.resourceName);
         }
 
-        GenerateResourcesHelper.Util.addOutputResource(context, ResourceUtils.DEFAULT_SCRIPT_RENDERER_TYPE, generatedResource.libraryName, generatedResource.resourceName, "body");
+        ResourceGenerationStrategy.Util.addOutputResource(context, ResourceUtils.DEFAULT_SCRIPT_RENDERER_TYPE, generatedResource.libraryName, generatedResource.resourceName, "body");
 
     }
 }
