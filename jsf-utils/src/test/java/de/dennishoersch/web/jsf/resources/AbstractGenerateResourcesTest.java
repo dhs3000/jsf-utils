@@ -56,7 +56,7 @@ public abstract class AbstractGenerateResourcesTest extends BaseJSFTest {
 
         view = facesContext.getViewRoot();
 
-        GenerateResources generateResources = new GenerateResources(createHelper(), "test");
+        GenerateResources generateResources = new GenerateResources(createStrategy(), "test");
 
         generateResourcesWrapper = new GenerateResourcesWrapper(generateResources);
 
@@ -66,7 +66,7 @@ public abstract class AbstractGenerateResourcesTest extends BaseJSFTest {
     /**
      * @return the helper for this tests
      */
-    protected abstract ResourceGenerationStrategy createHelper();
+    protected abstract ResourceGenerationStrategy createStrategy();
 
     @Override
     protected void setUpServletObjects() throws Exception {
