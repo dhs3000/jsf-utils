@@ -27,8 +27,6 @@ import javax.faces.component.UIComponent;
 import javax.faces.event.PreRenderComponentEvent;
 
 import org.apache.myfaces.shared.renderkit.html.util.ResourceUtils;
-import org.hamcrest.Description;
-import org.hamcrest.TypeSafeMatcher;
 import org.junit.Test;
 
 import com.google.common.collect.Iterables;
@@ -107,28 +105,5 @@ public class LessStylesheetBuilderTest extends AbstractGenerateResourcesTest {
         }
     }
 
-    static <T extends Iterable<?>> Size<T> size(int size) {
-        return new Size<T>(size);
-    }
-
-    static class Size<T extends Iterable<?>> extends TypeSafeMatcher<T> {
-        private final int size;
-
-        public Size(int size) {
-            this.size = size;
-        }
-
-        @Override
-        public boolean matchesSafely(T item) {
-            int size_ = Iterables.size(item);
-            return size_ == size;
-        }
-
-        @Override
-        public void describeTo(Description description) {
-            description.appendText("size of collection is " + size);
-        }
-
-    }
 
 }

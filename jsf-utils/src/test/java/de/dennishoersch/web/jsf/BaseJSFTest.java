@@ -23,6 +23,10 @@ import javax.faces.context.FacesContext;
 
 import org.apache.myfaces.test.mock.MockResponseWriter;
 import org.apache.myfaces.view.facelets.FaceletTestCase;
+import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
+
+import com.google.common.collect.Iterables;
 
 /**
  * @author hoersch
@@ -44,5 +48,30 @@ public abstract class BaseJSFTest extends FaceletTestCase {
         component.encodeAll(facesContext);
         sw.flush();
         return sw.toString();
+    }
+
+
+    protected static <T extends Iterable<?>> Size<T> size(int size) {
+        return new Size<T>(size);
+    }
+
+    protected static class Size<T extends Iterable<?>> extends TypeSafeMatcher<T> {
+        private final int size;
+
+        public Size(int size) {
+            this.size = size;
+        }
+
+        @Override
+        public boolean matchesSafely(T item) {
+            int size_ = Iterables.size(item);
+            return size_ == size;
+        }
+
+        @Override
+        public void describeTo(Description description) {
+            description.appendText("size of collection is " + size);
+        }
+
     }
 }
