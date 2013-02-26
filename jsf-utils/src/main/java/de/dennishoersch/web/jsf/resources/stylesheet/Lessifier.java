@@ -16,8 +16,6 @@
 package de.dennishoersch.web.jsf.resources.stylesheet;
 
 import java.net.URL;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.lesscss.LessCompiler;
 import org.lesscss.LessException;
@@ -27,13 +25,18 @@ import org.lesscss.LessException;
  *
  */
 public final class Lessifier {
-    private static final LessCompiler _lessCompiler = create();
-    private static final Lock _lock = new ReentrantLock();
+    // There are ThreadLocals involved so sharing between threads is not possible
+    private static final ThreadLocal<LessCompiler> _lessCompiler = new ThreadLocal<LessCompiler>() {
+        @Override
+        protected LessCompiler initialValue() {
+            return create();
+        }
+    };
 
     private Lessifier() {
     }
 
-    private static LessCompiler create() {
+    protected static LessCompiler create() {
         LessCompiler compiler = new LessCompiler();
         compiler.setCompress(true);
 
@@ -44,14 +47,11 @@ public final class Lessifier {
     }
 
     public static String lessify(String less) {
-        _lock.lock();
         try {
-            String css = _lessCompiler.compile(less);
+            String css = _lessCompiler.get().compile(less);
             return clean(css);
         } catch (LessException e) {
             throw new IllegalStateException(e);
-        } finally {
-            _lock.unlock();
         }
     }
 
