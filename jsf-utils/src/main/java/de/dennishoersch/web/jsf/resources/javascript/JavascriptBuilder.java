@@ -56,7 +56,7 @@ public class JavascriptBuilder extends AbstractResourceBuilder {
      * @param fileExtension
      */
     protected JavascriptBuilder(String generationKey, Collection<ResourceMetadata> scripts, FacesContext context, String version, String resourcesFolder) {
-        super(generationKey, scripts, context, version, resourcesFolder, FILE_EXTENSION, GENERATED_LIB);
+        super(generationKey, scripts, context, version, resourcesFolder, GENERATED_LIB, FILE_EXTENSION);
         _resourceHandler = context.getApplication().getResourceHandler();
     }
 
