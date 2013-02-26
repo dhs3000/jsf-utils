@@ -31,6 +31,8 @@ import javax.faces.application.ResourceHandler;
 import javax.faces.context.FacesContext;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.myfaces.shared.resource.BaseResourceHandlerSupport;
+import org.apache.myfaces.shared.resource.ResourceHandlerSupport;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -46,6 +48,8 @@ import com.google.common.io.ByteStreams;
 public class ImportInliner {
 
     private static final Logger logger = Logger.getLogger(ImportInliner.class.getName());
+
+    private static ResourceHandlerSupport _resourceHandlerSupport;
 
     private static final String IMPORT_TAG = "@import";
 
@@ -63,14 +67,17 @@ public class ImportInliner {
 
     private final ResourceHandler _resourceHandler;
 
+    private final String _contentType;
+
     /**
      * @param resourceName
      * @param libraryName
      * @param context
      */
-    public ImportInliner(String resourceName, String libraryName, FacesContext context) {
-        this._resourceName = resourceName;
-        this._libraryName = libraryName;
+    public ImportInliner(String resourceName, String libraryName, String contentType, FacesContext context) {
+        _resourceName = resourceName;
+        _libraryName = libraryName;
+        _contentType = contentType;
         _resourceHandler = context.getApplication().getResourceHandler();
     }
 
@@ -79,7 +86,7 @@ public class ImportInliner {
      * @throws IOException
      */
     public String execute() throws IOException {
-        Resource resource = _resourceHandler.createResource(_resourceName, _libraryName);
+        Resource resource = createResource(_libraryName, _resourceName);
         if (resource == null) {
             throw new IllegalStateException("Stylesheet '" + _libraryName + ":" + _resourceName + "' not found!");
         }
@@ -137,24 +144,11 @@ public class ImportInliner {
 
             return inlineByJSFResource(libraryName, resourceName);
         }
-        // or #{resource['styles:imported.less']}
-        if (importTag.startsWith("#{resource[") && importTag.endsWith("]}")) {
-            String resource = importTag.substring("#{resource[".length(), importTag.lastIndexOf("]}"));
-            resource = resource.replace("\"", "").replace("'", "");
-            String[] resourceParts = resource.split(":");
-            if (resourceParts.length<2) {
-                throw new IllegalStateException("Stylesheet '" + _libraryName + ":" + _resourceName + "' contains an @import '" + importTag + "', which can't be inlined (seams incorrect synatx)!");
-            }
-            String libraryName = resourceParts[0];
-            String resourceName = resourceParts[1];
-
-            return inlineByJSFResource(libraryName, resourceName);
-        }
         throw new IllegalStateException("Stylesheet '" + _libraryName + ":" + _resourceName + "' contains an @import '" + importTag + "', which can't be inlined (seams to be no JSF resource)!");
     }
 
     private String inlineByJSFResource(String libraryName, String resourceName) throws IOException {
-        Resource resource = _resourceHandler.createResource(resourceName, libraryName);
+        Resource resource = createResource(libraryName, resourceName);
         if (resource != null) {
             logger.log(Level.INFO, String.format("Inlined resource: '%s:%s'", libraryName, resourceName));
             return new String(ByteStreams.toByteArray(resource.getInputStream()));
@@ -162,12 +156,24 @@ public class ImportInliner {
         throw new IllegalStateException("Stylesheet '" + _libraryName + ":" + _resourceName + "' contains an @import of resource '" + libraryName + ":" + resourceName + "', which can't be handled / located by JSF resource handler!");
     }
 
+    private Resource createResource(String libraryName, String resourceName) {
+        return _resourceHandler.createResource(resourceName, libraryName, _contentType);
+    }
+
     private String getResourceName(String resource) {
         String resourceName = resource.substring(0, resource.indexOf('?'));
-        resourceName = resourceName.replace(".xhtml", "").replace(".faces", "").replace(".jsf", ""); // replace the
-                                                                                                     // standard-jsf
-                                                                                                     // extensions
+        String mapping = getMaping();
+        if (mapping != null) { // replace the mapping
+            resourceName = resourceName.replace(mapping, "");
+        }
         return resourceName.trim();
+    }
+
+    private String getMaping() {
+        if (_resourceHandlerSupport == null) {
+            _resourceHandlerSupport = new BaseResourceHandlerSupport();
+        }
+        return _resourceHandlerSupport.getMapping();
     }
 
     private String getLibraryName(String resource) {
