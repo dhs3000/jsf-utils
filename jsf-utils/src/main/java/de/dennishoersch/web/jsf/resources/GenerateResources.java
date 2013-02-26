@@ -35,7 +35,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import de.dennishoersch.web.jsf.utils.FacesConfig;
+import de.dennishoersch.web.jsf.utils.JsfUtilsConfig;
 
 /**
  * Processes a set of resources into a single generated resource with the help of a given strategy ({@link ResourceGenerationStrategy}).
@@ -83,7 +83,7 @@ public class GenerateResources {
 
         String generationKey = asGenerationKey(resources);
 
-        if (FacesConfig.isDevelopment(context)) {
+        if (JsfUtilsConfig.isCacheGeneratedResourcesDisabled(context)) {
             clearCache(generationKey);
         }
 
