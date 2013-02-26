@@ -37,12 +37,13 @@ import de.dennishoersch.web.jsf.resources.ResourceMetadata;
 public class LessStylesheetBuilder extends AbstractResourceBuilder {
     private static final Logger logger = Logger.getLogger(LessStylesheetBuilder.class.getName());
 
-
     /** Library name of the generated resource. */
     private static final String GENERATED_LIB = "generated.css";
 
     /** file extension of the generated resource. */
     private static final String FILE_EXTENSION = ".css";
+
+    private static final String CONTENT_TYPE = "text/css";
 
     /**
      * @param generationKey
@@ -52,7 +53,7 @@ public class LessStylesheetBuilder extends AbstractResourceBuilder {
      * @param resourcesFolder
      */
     public LessStylesheetBuilder(String generationKey, Collection<ResourceMetadata> stylesheets, FacesContext context, String version, String resourcesFolder) {
-        super(generationKey, stylesheets, context, version, resourcesFolder, FILE_EXTENSION, GENERATED_LIB);
+        super(generationKey, stylesheets, context, version, resourcesFolder, GENERATED_LIB, FILE_EXTENSION);
     }
 
     /**
@@ -74,10 +75,9 @@ public class LessStylesheetBuilder extends AbstractResourceBuilder {
         return newGeneratedResourceMetadata(cssFilename);
     }
 
-
     @Override
     protected String readSingleResource(ResourceMetadata stylesheet) throws IOException {
         logger.log(Level.INFO, String.format("Read style resource: '%s:%s'", stylesheet.libraryName, stylesheet.resourceName));
-        return new ImportInliner(stylesheet.resourceName, stylesheet.libraryName, _context).execute();
+        return new ImportInliner(stylesheet.resourceName, stylesheet.libraryName, CONTENT_TYPE, _context).execute();
     }
 }
