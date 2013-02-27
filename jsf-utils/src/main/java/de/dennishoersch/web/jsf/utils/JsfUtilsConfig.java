@@ -25,6 +25,7 @@ import org.apache.myfaces.shared.util.WebConfigParamUtils;
 public final class JsfUtilsConfig {
 
     public static final String CACHE_GENERATED_RESOURCES_DISABLED_PARAM = "de.dennishoersch.web.jsf.resources.CACHE_GENERATED_RESOURCES_DISABLED";
+    private static Boolean _CACHE_GENERATED_RESOURCES_DISABLED;
 
     private JsfUtilsConfig() {
     }
@@ -35,11 +36,13 @@ public final class JsfUtilsConfig {
      * @return whether the production mode is activated
      */
     public static boolean isCacheGeneratedResourcesDisabled(FacesContext context) {
-        return getBooleanInitParameter(context, CACHE_GENERATED_RESOURCES_DISABLED_PARAM, false);
+        if (_CACHE_GENERATED_RESOURCES_DISABLED == null) {
+            _CACHE_GENERATED_RESOURCES_DISABLED = getBooleanInitParameter(context, CACHE_GENERATED_RESOURCES_DISABLED_PARAM, false);
+        }
+        return _CACHE_GENERATED_RESOURCES_DISABLED.booleanValue();
     }
 
-
-    private static boolean getBooleanInitParameter(FacesContext context, String paramName, boolean defaulValue) {
-        return WebConfigParamUtils.getBooleanInitParameter(context.getExternalContext(), paramName, defaulValue);
+    private static Boolean getBooleanInitParameter(FacesContext context, String paramName, boolean defaulValue) {
+        return Boolean.valueOf(WebConfigParamUtils.getBooleanInitParameter(context.getExternalContext(), paramName, defaulValue));
     }
 }
