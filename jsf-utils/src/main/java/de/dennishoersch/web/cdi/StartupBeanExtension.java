@@ -19,6 +19,7 @@ import java.util.Set;
 
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterDeploymentValidation;
+import javax.enterprise.inject.spi.Annotated;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.Extension;
@@ -37,18 +38,18 @@ import com.google.common.collect.Sets;
 public class StartupBeanExtension implements Extension {
     private Set<Bean<?>> _startupBeans = Sets.newLinkedHashSet();
 
-    public void processBean(@Observes ProcessBean<?> event) {
-        if (event.getAnnotated().isAnnotationPresent(Startup.class) && (event.getAnnotated().isAnnotationPresent(Singleton.class) || event.getAnnotated().isAnnotationPresent(ApplicationScoped.class))) {
+    public void collectStartupBean(@Observes ProcessBean<?> event) {
+        Annotated annotated = event.getAnnotated();
+        if (annotated.isAnnotationPresent(Startup.class) && (annotated.isAnnotationPresent(Singleton.class) || annotated.isAnnotationPresent(ApplicationScoped.class))) {
             _startupBeans.add(event.getBean());
         }
     }
 
-    public void afterDeploymentValidation(@SuppressWarnings("unused") @Observes AfterDeploymentValidation event, BeanManager manager) {
+    public void initializeStartupBeans(@SuppressWarnings("unused") @Observes AfterDeploymentValidation event, BeanManager manager) {
         if (_startupBeans == null) {
             return;
         }
         for (Bean<?> bean : _startupBeans) {
-            // the call to toString() is a cheat to force the bean to be initialized
             manager.getReference(bean, bean.getBeanClass(), manager.createCreationalContext(bean)).toString();
         }
         _startupBeans = null;
