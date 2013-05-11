@@ -34,8 +34,8 @@ import de.dennishoersch.web.jsf.resources.ResourceMetadata;
  *
  * @author hoersch
  */
-public class LessStylesheetBuilder extends AbstractResourceBuilder {
-    private static final Logger logger = Logger.getLogger(LessStylesheetBuilder.class.getName());
+public class ProcessingStylesheetBuilder extends AbstractResourceBuilder {
+    private static final Logger logger = Logger.getLogger(ProcessingStylesheetBuilder.class.getName());
 
     /** Library name of the generated resource. */
     private static final String GENERATED_LIB = "generated.css";
@@ -45,15 +45,19 @@ public class LessStylesheetBuilder extends AbstractResourceBuilder {
 
     private static final String CONTENT_TYPE = "text/css";
 
+    private final StylesheetProcessor _processor;
+
     /**
+     * @param processor
      * @param generationKey
      * @param stylesheets
      * @param context
      * @param version
      * @param resourcesFolder
      */
-    public LessStylesheetBuilder(String generationKey, Collection<ResourceMetadata> stylesheets, FacesContext context, String version, String resourcesFolder) {
+    public ProcessingStylesheetBuilder(StylesheetProcessor processor, String generationKey, Collection<ResourceMetadata> stylesheets, FacesContext context, String version, String resourcesFolder) {
         super(generationKey, stylesheets, context, version, resourcesFolder, GENERATED_LIB, FILE_EXTENSION);
+        _processor = processor;
     }
 
     /**
@@ -65,7 +69,7 @@ public class LessStylesheetBuilder extends AbstractResourceBuilder {
 
         String stylesheet = readAndConcatFileContents();
 
-        stylesheet = Lessifier.lessify(stylesheet);
+        stylesheet = _processor.process(stylesheet);
 
         String cssFilename = getGeneratedFilename();
         String resourceFileName = asAbsoluteResourceFileName(cssFilename);

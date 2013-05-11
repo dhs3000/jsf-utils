@@ -30,16 +30,21 @@ import javax.faces.context.FacesContext;
 
 import org.apache.myfaces.shared.renderkit.html.util.ResourceUtils;
 
-import de.dennishoersch.web.jsf.resources.ResourceGenerationStrategy;
 import de.dennishoersch.web.jsf.resources.GeneratedResourceMetadata;
+import de.dennishoersch.web.jsf.resources.ResourceGenerationStrategy;
 import de.dennishoersch.web.jsf.resources.ResourceMetadata;
 
 /**
- * Reads all registered stylesheets and lessifies them before registering a new single stylesheet resource instead of them.
+ * Reads all registered stylesheets and processes them with the given StylesheetProcessor before registering a new single stylesheet resource instead of them.
  * @author hoersch
  */
-public class LessStylesheetGenerationStrategy implements ResourceGenerationStrategy {
+public class ProcessingStylesheetGenerationStrategy implements ResourceGenerationStrategy {
 
+    private final StylesheetProcessor _processor;
+
+    public ProcessingStylesheetGenerationStrategy(StylesheetProcessor processor) {
+        _processor = processor;
+    }
     @Override
     public Iterable<ResourceMetadata> collectResources(final UIViewRoot view, final FacesContext context) {
         List<UIComponent> resources = view.getComponentResources(context, "head");
@@ -48,7 +53,7 @@ public class LessStylesheetGenerationStrategy implements ResourceGenerationStrat
 
     @Override
     public GeneratedResourceMetadata generateResource(FacesContext context, Collection<ResourceMetadata> resources, String generationKey, String version, String resourcesFolder) throws IOException {
-        return new LessStylesheetBuilder(generationKey, resources, context, version, resourcesFolder).build();
+        return new ProcessingStylesheetBuilder(_processor, generationKey, resources, context, version, resourcesFolder).build();
     }
 
     @Override

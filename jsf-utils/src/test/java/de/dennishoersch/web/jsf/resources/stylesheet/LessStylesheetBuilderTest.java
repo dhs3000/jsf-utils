@@ -45,7 +45,7 @@ public class LessStylesheetBuilderTest extends AbstractGenerateResourcesTest {
 
     @Override
     protected ResourceGenerationStrategy createStrategy() {
-        return new LessStylesheetGenerationStrategy();
+        return new ProcessingStylesheetGenerationStrategy(new LessStylesheetProcessor());
     }
 
     @Test
