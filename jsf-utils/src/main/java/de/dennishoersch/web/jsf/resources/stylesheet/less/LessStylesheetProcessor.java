@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.dennishoersch.web.jsf.resources.stylesheet;
+package de.dennishoersch.web.jsf.resources.stylesheet.less;
+
+import de.dennishoersch.web.jsf.resources.stylesheet.StylesheetProcessor;
 
 /**
  * @author hoersch

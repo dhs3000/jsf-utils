@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.dennishoersch.web.jsf.resources.stylesheet;
+package de.dennishoersch.web.jsf.resources.stylesheet.less;
 
 import static junit.framework.Assert.fail;
 import static org.hamcrest.Matchers.containsString;
@@ -23,6 +23,8 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 import org.lesscss.LessException;
+
+import de.dennishoersch.web.jsf.resources.stylesheet.less.Lessifier;
 
 /**
  * @author hoersch

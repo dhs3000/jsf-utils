@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.dennishoersch.web.jsf.resources.stylesheet;
+package de.dennishoersch.web.jsf.resources.stylesheet.less;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -33,6 +33,8 @@ import com.google.common.collect.Iterables;
 
 import de.dennishoersch.web.jsf.resources.AbstractGenerateResourcesTest;
 import de.dennishoersch.web.jsf.resources.ResourceGenerationStrategy;
+import de.dennishoersch.web.jsf.resources.stylesheet.ProcessingStylesheetGenerationStrategy;
+import de.dennishoersch.web.jsf.resources.stylesheet.less.LessStylesheetProcessor;
 
 /**
  * @author hoersch

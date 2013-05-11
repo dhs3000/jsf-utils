@@ -22,7 +22,7 @@ import javax.faces.event.SystemEventListener;
 
 import de.dennishoersch.web.jsf.resources.javascript.JavascriptGenerationStrategy;
 import de.dennishoersch.web.jsf.resources.stylesheet.ProcessingStylesheetGenerationStrategy;
-import de.dennishoersch.web.jsf.resources.stylesheet.LessStylesheetProcessor;
+import de.dennishoersch.web.jsf.resources.stylesheet.less.LessStylesheetProcessor;
 
 /**
  * Listener that post-processes the view root and the registered stylesheets and scripts.
