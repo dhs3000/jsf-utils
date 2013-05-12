@@ -22,24 +22,38 @@ import javax.faces.event.SystemEventListener;
 
 import de.dennishoersch.web.jsf.resources.javascript.JavascriptGenerationStrategy;
 import de.dennishoersch.web.jsf.resources.stylesheet.ProcessingStylesheetGenerationStrategy;
+import de.dennishoersch.web.jsf.resources.stylesheet.cssutis.InlineImagesStylesheetProcessor;
+import de.dennishoersch.web.jsf.resources.stylesheet.cssutis.NormalizeStylesheetProcessor;
 import de.dennishoersch.web.jsf.resources.stylesheet.less.LessStylesheetProcessor;
 
 /**
  * Listener that post-processes the view root and the registered stylesheets and scripts.
  *
- * <p>Usage: Register the listener in faces-config.xml with
+ * <p>
+ * Usage: Register the listener in faces-config.xml with
+ *
  * <pre>
  * &lt;system-event-listener>
  *     &lt;system-event-listener-class>de.dennishoersch.web.jsf.resources.PostProcessResourcesPreRenderListener&lt;/system-event-listener-class>
  *     &lt;system-event-class>javax.faces.event.PreRenderComponentEvent&lt;/system-event-class>
  * &lt;/system-event-listener> *
  * </pre>
+ *
  * </p>
+ *
  * @author hoersch
  */
 public class PostProcessResourcesPreRenderListener implements SystemEventListener {
 
-    private GenerateResources _stylesheetPostProcessor = new GenerateResources(new ProcessingStylesheetGenerationStrategy(new LessStylesheetProcessor()), "0.1");
+    //@formatter:off
+    private GenerateResources _stylesheetPostProcessor = new GenerateResources(
+            ProcessingStylesheetGenerationStrategy.with(
+                    new LessStylesheetProcessor(),
+                    new NormalizeStylesheetProcessor(),
+                    new InlineImagesStylesheetProcessor()),
+            "0.1");
+    //@formatter:on
+
     private GenerateResources _javascriptPostProcessor = new GenerateResources(new JavascriptGenerationStrategy(), "0.1");
 
     @Override
@@ -51,15 +65,15 @@ public class PostProcessResourcesPreRenderListener implements SystemEventListene
     public void processEvent(SystemEvent event) {
         UIViewRoot view = (UIViewRoot) event.getSource();
 
-        postPocessStyles(view);
-        postPocessScripts(view);
+        postProcessStyles(view);
+        postProcessScripts(view);
     }
 
-    private void postPocessStyles(UIViewRoot view) {
+    private void postProcessStyles(UIViewRoot view) {
         _stylesheetPostProcessor.edit(view, FacesContext.getCurrentInstance());
     }
 
-    private void postPocessScripts(UIViewRoot view) {
+    private void postProcessScripts(UIViewRoot view) {
         _javascriptPostProcessor.edit(view, FacesContext.getCurrentInstance());
     }
 
