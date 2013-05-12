@@ -34,7 +34,6 @@ import com.google.common.collect.Iterables;
 import de.dennishoersch.web.jsf.resources.AbstractGenerateResourcesTest;
 import de.dennishoersch.web.jsf.resources.ResourceGenerationStrategy;
 import de.dennishoersch.web.jsf.resources.stylesheet.ProcessingStylesheetGenerationStrategy;
-import de.dennishoersch.web.jsf.resources.stylesheet.less.LessStylesheetProcessor;
 
 /**
  * @author hoersch
@@ -47,7 +46,7 @@ public class LessStylesheetBuilderTest extends AbstractGenerateResourcesTest {
 
     @Override
     protected ResourceGenerationStrategy createStrategy() {
-        return new ProcessingStylesheetGenerationStrategy(new LessStylesheetProcessor());
+        return ProcessingStylesheetGenerationStrategy.with(new LessStylesheetProcessor());
     }
 
     @Test

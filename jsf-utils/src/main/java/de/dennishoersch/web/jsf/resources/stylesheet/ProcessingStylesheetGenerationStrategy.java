@@ -35,16 +35,39 @@ import de.dennishoersch.web.jsf.resources.ResourceGenerationStrategy;
 import de.dennishoersch.web.jsf.resources.ResourceMetadata;
 
 /**
- * Reads all registered stylesheets and processes them with the given StylesheetProcessor before registering a new single stylesheet resource instead of them.
+ * Reads all registered stylesheets and processes them with the given StylesheetProcessor(s) before registering a new single stylesheet resource instead of them.
  * @author hoersch
  */
 public class ProcessingStylesheetGenerationStrategy implements ResourceGenerationStrategy {
 
     private final StylesheetProcessor _processor;
 
-    public ProcessingStylesheetGenerationStrategy(StylesheetProcessor processor) {
+    private ProcessingStylesheetGenerationStrategy(StylesheetProcessor processor) {
         _processor = processor;
     }
+
+    public static ProcessingStylesheetGenerationStrategy with(StylesheetProcessor...processors) {
+        class ChainedStylesheetProcessor implements StylesheetProcessor {
+
+            private final StylesheetProcessor[] _processors;
+
+            public ChainedStylesheetProcessor(StylesheetProcessor... procs) {
+                _processors = procs;
+            }
+
+            @Override
+            public String process(String stylesheet, FacesContext context) {
+                String result = stylesheet;
+                for (StylesheetProcessor processor : _processors) {
+                    result = processor.process(result, context);
+                }
+                return result;
+            }
+
+        }
+        return new ProcessingStylesheetGenerationStrategy(new ChainedStylesheetProcessor(processors));
+    }
+
     @Override
     public Iterable<ResourceMetadata> collectResources(final UIViewRoot view, final FacesContext context) {
         List<UIComponent> resources = view.getComponentResources(context, "head");
