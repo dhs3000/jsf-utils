@@ -15,10 +15,12 @@
  */
 package de.dennishoersch.web.jsf.resources.stylesheet;
 
+import javax.faces.context.FacesContext;
+
 /**
  * Processes a given stylesheet.
  * @author hoersch
  */
 public interface StylesheetProcessor {
-    String process(String stylesheet);
+    String process(String stylesheet, FacesContext context);
 }

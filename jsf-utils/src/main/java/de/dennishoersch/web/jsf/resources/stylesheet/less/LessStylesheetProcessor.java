@@ -15,6 +15,8 @@
  */
 package de.dennishoersch.web.jsf.resources.stylesheet.less;
 
+import javax.faces.context.FacesContext;
+
 import de.dennishoersch.web.jsf.resources.stylesheet.StylesheetProcessor;
 
 /**
@@ -24,7 +26,7 @@ import de.dennishoersch.web.jsf.resources.stylesheet.StylesheetProcessor;
 public class LessStylesheetProcessor implements StylesheetProcessor {
 
     @Override
-    public String process(String stylesheet) {
+    public String process(String stylesheet, FacesContext context) {
         return Lessifier.lessify(stylesheet);
     }
 }
