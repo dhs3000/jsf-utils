@@ -69,7 +69,7 @@ public class ProcessingStylesheetBuilder extends AbstractResourceBuilder {
 
         String stylesheet = readAndConcatFileContents();
 
-        stylesheet = _processor.process(stylesheet);
+        stylesheet = _processor.process(stylesheet, _context);
 
         String cssFilename = getGeneratedFilename();
         String resourceFileName = asAbsoluteResourceFileName(cssFilename);
