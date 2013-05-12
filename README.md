@@ -12,7 +12,10 @@ The post-processor modifies all referenced stylesheet and script resources of th
 
 For the stylesheets (referenced by <em>&lt;h:outputStylesheet /></em>) it enables the usage of LESS (instead of pure CSS). All stylesheets are collected into one file and afterwards compiled with the less compiler so that variable declarions etc. defined in different files could be used everywhere.
 
+Also the stylesheet is normalized and all background images are inlined into the stylesheet with the help of data URIs.
+
 + <a href="http://lesscss.org/">LESS CSS</a>
++ <a herf="https://github.com/dhs3000/css-utils">CSS Utils</a>
 
 All scripts (referenced by <em>&lt;h:outputScript /></em>) are collected into one single file and compiled by the Google Closure Compiler to remove unnecessary code etc.
 
