@@ -18,12 +18,13 @@
 	<classpathentry kind="lib" path="lib/tomcat-jasper-el-7.0.35.jar"/>
 	<classpathentry kind="lib" path="lib/myfaces-test20-1.0.3.jar" sourcepath="lib/sources/myfaces-test20-1.0.4-sources.jar"/>
 	<classpathentry kind="lib" path="lib/commons-beanutils-1.8.3.jar"/>
-	<classpathentry kind="lib" path="lib/commons-codec-1.3.jar"/>
+	<classpathentry kind="lib" path="lib/commons-codec-1.3.jar" sourcepath="/home/dennse/.m2/repository/commons-codec/commons-codec/1.3/commons-codec-1.3-sources.jar"/>
 	<classpathentry kind="lib" path="lib/commons-collections-3.2.jar"/>
 	<classpathentry kind="lib" path="lib/commons-digester-1.8.jar"/>
 	<classpathentry kind="lib" path="lib/hamcrest-all-1.3.jar"/>
 	<classpathentry kind="lib" path="lib/closure-compiler-r2388.jar" sourcepath="lib/sources/google-closure-compiler-sources.jar"/>
 	<classpathentry kind="lib" path="lib/json-20090211.jar"/>
 	<classpathentry kind="lib" path="lib/weld-servlet-1.1.10.Final.jar" sourcepath="lib/sources/weld-servlet-core-1.1.10.Final-sources.jar"/>
+	<classpathentry kind="lib" path="lib/css-utils-1.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
