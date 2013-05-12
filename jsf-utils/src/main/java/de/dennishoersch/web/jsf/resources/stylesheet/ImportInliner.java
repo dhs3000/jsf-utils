@@ -27,16 +27,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.faces.application.Resource;
-import javax.faces.application.ResourceHandler;
 import javax.faces.context.FacesContext;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.myfaces.shared.resource.BaseResourceHandlerSupport;
-import org.apache.myfaces.shared.resource.ResourceHandlerSupport;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.google.common.io.ByteStreams;
+
+import de.dennishoersch.web.jsf.resources.ResourceUtils;
 
 /**
  * Inlines all possible imported stylesheets into one stylesheet.
@@ -48,8 +46,6 @@ import com.google.common.io.ByteStreams;
 public class ImportInliner {
 
     private static final Logger logger = Logger.getLogger(ImportInliner.class.getName());
-
-    private static ResourceHandlerSupport _resourceHandlerSupport;
 
     private static final String IMPORT_TAG = "@import";
 
@@ -65,7 +61,7 @@ public class ImportInliner {
 
     private final String _libraryName;
 
-    private final ResourceHandler _resourceHandler;
+    private final FacesContext _context;
 
     private final String _contentType;
 
@@ -78,7 +74,7 @@ public class ImportInliner {
         _resourceName = resourceName;
         _libraryName = libraryName;
         _contentType = contentType;
-        _resourceHandler = context.getApplication().getResourceHandler();
+        _context = context;
     }
 
     /**
@@ -136,11 +132,10 @@ public class ImportInliner {
 
     private String inlineImport(String importTag) throws IOException {
         // JSF resource URLs look like 'bla.css.faces?ln=css/... & xxx'
-        if (importTag.contains(ResourceHandler.RESOURCE_IDENTIFIER)) {
-            String resource = importTag.substring(importTag.indexOf(ResourceHandler.RESOURCE_IDENTIFIER) + ResourceHandler.RESOURCE_IDENTIFIER.length() + 1);
+        if (ResourceUtils.isResourceURL(importTag)) {
 
-            String resourceName = getResourceName(resource);
-            String libraryName = getLibraryName(resource);
+            String resourceName = ResourceUtils.getResourceName(importTag);
+            String libraryName = ResourceUtils.getLibraryName(importTag);
 
             return inlineByJSFResource(libraryName, resourceName);
         }
@@ -148,41 +143,20 @@ public class ImportInliner {
     }
 
     private String inlineByJSFResource(String libraryName, String resourceName) throws IOException {
-        Resource resource = createResource(libraryName, resourceName);
-        if (resource != null) {
+        byte[] content = getResourceContent(libraryName, resourceName);
+        if (content != null) {
             logger.log(Level.INFO, String.format("Inlined resource: '%s:%s'", libraryName, resourceName));
-            return new String(ByteStreams.toByteArray(resource.getInputStream()));
+            return new String(content);
         }
         throw new IllegalStateException("Stylesheet '" + _libraryName + ":" + _resourceName + "' contains an @import of resource '" + libraryName + ":" + resourceName + "', which can't be handled / located by JSF resource handler!");
     }
 
     private Resource createResource(String libraryName, String resourceName) {
-        return _resourceHandler.createResource(resourceName, libraryName, _contentType);
+        return ResourceUtils.createResource(_context, libraryName, resourceName, _contentType);
     }
 
-    private String getResourceName(String resource) {
-        String resourceName = resource.substring(0, resource.indexOf('?'));
-        String mapping = getMaping();
-        if (mapping != null) { // replace the mapping
-            resourceName = resourceName.replace(mapping, "");
-        }
-        return resourceName.trim();
-    }
-
-    private String getMaping() {
-        if (_resourceHandlerSupport == null) {
-            _resourceHandlerSupport = new BaseResourceHandlerSupport();
-        }
-        return _resourceHandlerSupport.getMapping();
-    }
-
-    private String getLibraryName(String resource) {
-        String libraryName = resource.substring(resource.indexOf("ln=") + 3);
-        int next = libraryName.indexOf('&');
-        if (next >= 0) {
-            libraryName = libraryName.substring(0, next);
-        }
-        return libraryName.trim();
+    private byte[] getResourceContent(String libraryName, String resourceName) throws IOException {
+        return ResourceUtils.getResourceContent(_context, libraryName, resourceName, _contentType);
     }
 
     static String removeCssComments(String s) {
